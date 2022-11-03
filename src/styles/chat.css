@@ -44,7 +44,7 @@
   height: auto;
   min-height: 40px;
   max-width: 250px;
-  background-color: rgb(213, 213, 213);
+  background-color: rgba(189, 204, 216, 0.912);
   border-radius: 15px 15px 15px 0px;
   color: rgb(56, 56, 56);
   display: flex;
@@ -77,9 +77,9 @@
 
 #other .message-content {
   justify-content: flex-end;
-  background-color: rgb(11, 126, 244);
+  background-color: rgba(11, 128, 244, 0.704);
   border-radius: 15px 15px 0px 15px;
-  color: rgb(241, 241, 241);
+  color: rgb(217, 217, 217);
 }
 
 #other .message-meta {
@@ -95,6 +95,7 @@
 .chat-window .chat-body .message .message-meta {
   display: flex;
   font-size: 12px;
+  color: #78849c;
 }
 
 .hide {

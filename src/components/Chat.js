@@ -12,44 +12,57 @@ const socket = io.connect(API, {
   transports: ["websocket"],
 });
 
-function Chat({ socket, username, room }) {
+function Chat() {
+  let username = "dilshanhiruna";
+  let room = "room1";
+
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
 
   const [loadingMsgs, setloadingMsgs] = useState(true);
 
+  useEffect(() => {
+    socket.connect();
+    if (username !== "") {
+      socket.emit("join_room", room);
+    }
+    //reset the socket.io connection when the student group changes
+  }, []);
+
+  useEffect(() => {
+    setMessageList([]);
+  }, [room]);
+
+  useEffect(() => {
+    socket.removeAllListeners();
+    //get messages from server at the beginning of the chat
+    socket.on("get_messages", (data) => {
+      setMessageList(data);
+      setloadingMsgs(false);
+      console.log(data);
+    });
+
+    socket.on("receive_message", (data) => {
+      setMessageList((list) => [...list, data]);
+    });
+  }, [socket]);
+
   const sendMessage = async () => {
-    // if (currentMessage !== "") {
-    //   const messageData = {
-    //     room: room,
-    //     author: username,
-    //     message: currentMessage,
-    //     time:
-    //       new Date(Date.now()).getHours() +
-    //       ":" +
-    //       new Date(Date.now()).getMinutes(),
-    //   };
-    //   await socket.emit("send_message", messageData);
-    //   setMessageList((list) => [...list, messageData]);
-    //   setCurrentMessage("");
-    // }
+    if (currentMessage !== "") {
+      const messageData = {
+        room: room,
+        author: username,
+        message: currentMessage,
+        time:
+          new Date(Date.now()).getHours() +
+          ":" +
+          new Date(Date.now()).getMinutes(),
+      };
+      await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
+    }
   };
-  // useEffect(() => {
-  //   setMessageList([]);
-  // }, [room]);
-
-  // useEffect(() => {
-  //   socket.removeAllListeners();
-  //   //get messages from server at the beginning of the chat
-  //   socket.on("get_messages", (data) => {
-  //     setMessageList(data);
-  //     setloadingMsgs(false);
-  //   });
-
-  //   socket.on("receive_message", (data) => {
-  //     setMessageList((list) => [...list, data]);
-  //   });
-  // }, [socket]);
 
   return (
     <div className="chat-window">
@@ -71,8 +84,12 @@ function Chat({ socket, username, room }) {
                       <p>{messageContent.message}</p>
                     </div>
                     <div className="message-meta">
-                      <p id="time">{messageContent.time}</p>
-                      <p id="author">{messageContent.author}</p>
+                      <p id="time">{messageContent.time}&nbsp;</p>
+                      <p id="author">
+                        {username !== messageContent.author
+                          ? messageContent.author
+                          : "you"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -132,11 +149,11 @@ function Chat({ socket, username, room }) {
             variant="outlined"
             startIcon={<SendIcon sx={{ marginLeft: "15px" }} />}
             onClick={sendMessage}
-            // disabled={
-            //   currentMessage === "" ||
-            //   loadingMsgs ||
-            //   currentMessage.length > 1000
-            // }
+            disabled={
+              currentMessage === "" ||
+              loadingMsgs ||
+              currentMessage.length > 1000
+            }
           ></Button>
         </Stack>
       </div>
