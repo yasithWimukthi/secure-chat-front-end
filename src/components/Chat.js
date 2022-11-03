@@ -6,7 +6,7 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import "../styles/chat.css";
 import io from "socket.io-client";
 
-const API = process.env.REACT_APP_CHAT_API;
+const API = process.env.REACT_APP_API;
 
 const socket = io.connect(API, {
   transports: ["websocket"],
@@ -134,7 +134,7 @@ function Chat() {
             placeholder="Type a message..."
             value={currentMessage}
             sx={{
-              background: "rgba(79, 147, 206, 0.358)",
+              background: "#313641",
               borderRadius: "10px",
               marginRight: "10px",
             }}
