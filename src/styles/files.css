@@ -1,0 +1,14 @@
+.file-area {
+  width: 45%;
+  margin: 0 auto;
+  background-color: rgba(79, 147, 206, 0.103);
+  border-radius: 10px;
+  border: 1px solid #04426113;
+  height: 83vh;
+}
+.file-area h1 {
+  text-align: start;
+  padding: 0 20px;
+  font-size: 1.5rem;
+  color: rgb(179, 179, 179);
+}

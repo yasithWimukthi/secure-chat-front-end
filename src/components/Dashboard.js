@@ -1,12 +1,24 @@
 import Chat from "./Chat";
+import FileManage from "./FileManage";
+import "../styles/dashboard.css";
 
 const Dashboard = () => {
   return (
     <div>
-      <h1>Dashboard</h1>
-
-      <div className="chat-area">
-        <Chat />
+      <h2
+        style={{
+          marginLeft: "60px",
+        }}
+      >
+        ⚡Secure Chat System v0.1
+      </h2>
+      <div className="dashboard-content">
+        <div className="file-area">
+          <FileManage />
+        </div>
+        <div className="chat-area">
+          <Chat />
+        </div>
       </div>
     </div>
   );

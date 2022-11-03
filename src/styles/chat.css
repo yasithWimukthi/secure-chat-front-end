@@ -1,14 +1,17 @@
 .chat-area {
+  width: 40%;
+  height: 100%;
+  margin: 0 auto;
 }
 
 .chat-window {
-  margin: 0 50px;
-  width: 40%;
-  float: right;
 }
 
 .chat-window p {
   margin: 6;
+}
+#outlined-basic {
+  color: #fff;
 }
 
 .chat-window .chat-body {

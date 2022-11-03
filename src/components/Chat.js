@@ -90,7 +90,7 @@ function Chat({ socket, username, room }) {
               }}
             >
               <CircularProgress color="inherit" size={15} />
-              <p>Loading messages...</p>
+              <p>&nbsp;&nbsp;Loading messages...</p>
             </div>
           </>
         )}
@@ -117,8 +117,9 @@ function Chat({ socket, username, room }) {
             placeholder="Type a message..."
             value={currentMessage}
             sx={{
-              background: "white",
+              background: "rgba(79, 147, 206, 0.358)",
               borderRadius: "10px",
+              marginRight: "10px",
             }}
             onChange={(event) => {
               setCurrentMessage(event.target.value);
@@ -128,14 +129,14 @@ function Chat({ socket, username, room }) {
             }}
           />
           <Button
-            variant="contained"
-            startIcon={<SendIcon sx={{ marginLeft: "11px" }} />}
+            variant="outlined"
+            startIcon={<SendIcon sx={{ marginLeft: "15px" }} />}
             onClick={sendMessage}
-            disabled={
-              currentMessage === "" ||
-              loadingMsgs ||
-              currentMessage.length > 1000
-            }
+            // disabled={
+            //   currentMessage === "" ||
+            //   loadingMsgs ||
+            //   currentMessage.length > 1000
+            // }
           ></Button>
         </Stack>
       </div>
