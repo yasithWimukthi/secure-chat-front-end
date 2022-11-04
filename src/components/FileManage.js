@@ -5,15 +5,26 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import "../styles/files.css";
 import { DeleteOutline, Download } from "@mui/icons-material";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import { API } from "../api/api";
+import "../styles/files.css";
 const FileManage = () => {
   const [Manager, setManager] = useState(true);
   const [Files, setFiles] = useState([]);
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedFileForDel, setselectedFileForDel] = useState(false);
 
   const getFiles = async () => {
     const files = await API.getFiles();
@@ -35,11 +46,23 @@ const FileManage = () => {
     document.getElementById("file").value = "";
   };
 
-  const handleFileDelete = async (name) => {
-    const response = await API.deleteFile(name);
+  // const handleClickOpenDialog = () => {
+  //   setOpenDialog(true);
+  // };
 
-    if (response) {
-      getFiles();
+  // const handleCloseDialog = () => {
+  //   setOpenDialog(false);
+  // };
+
+  const handleFileDelete = async () => {
+    if (selectedFileForDel) {
+      const response = await API.deleteFile(selectedFileForDel);
+
+      if (response) {
+        getFiles();
+        setselectedFileForDel("");
+        setOpenDialog(false);
+      }
     }
   };
 
@@ -79,22 +102,31 @@ const FileManage = () => {
                           link.download = file.name;
                           link.click();
                         }}
+                        style={{
+                          marginRight: "20px",
+                        }}
                       >
                         <Download
                           style={{
-                            color: "rgba(79, 147, 206, 0.303)",
+                            color: "rgba(79, 147, 206, 0.300)",
                           }}
                         />
                       </IconButton>
-                      {"   "}
+
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={() => handleFileDelete(file.name)}
+                        onClick={() => {
+                          setselectedFileForDel(file.name);
+                          setOpenDialog(true);
+                        }}
+                        style={{
+                          marginRight: "20px",
+                        }}
                       >
                         <DeleteOutline
                           style={{
-                            color: "#34282f",
+                            color: "rgba(79, 147, 206, 0.200)",
                           }}
                         />
                       </IconButton>
@@ -114,6 +146,35 @@ const FileManage = () => {
             ))}
           </List>
         </div>
+        {/* Dialog for delete file */}
+
+        <Dialog
+          open={openDialog}
+          onClose={() => {
+            setOpenDialog(false);
+            setselectedFileForDel("");
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"Are you sure you want to delete this file?"}
+          </DialogTitle>
+
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOpenDialog(false);
+                setselectedFileForDel("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button color="error" onClick={handleFileDelete} autoFocus>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   else return <></>;
