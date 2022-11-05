@@ -2,11 +2,8 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
   ListItemText,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
@@ -15,9 +12,26 @@ import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
-import { API } from "../api/api";
+import axios from "axios";
+import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
+
+const baseURL = () => {
+  const apiUrl = process.env.REACT_APP_API
+    ? process.env.REACT_APP_API
+    : "http://localhost:3001";
+  return apiUrl;
+};
+
+const getInstance = () => {
+  return axios.create({
+    baseURL: baseURL(),
+  });
+};
+
 const FileManage = () => {
+  const { getAccessTokenSilently, user } = useAuth0();
+
   const [Manager, setManager] = useState(true);
   const [Files, setFiles] = useState([]);
 
@@ -25,18 +39,41 @@ const FileManage = () => {
   const [selectedFileForDel, setselectedFileForDel] = useState(false);
 
   const getFiles = async () => {
-    const files = await API.getFiles();
-    setFiles(files);
+    const token = await getAccessTokenSilently();
+
+    const response = await getInstance().get(`${baseURL()}/files`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // send users id through headers
+        userid: user.email,
+      },
+    });
+
+    setFiles(response.data);
   };
 
   useEffect(() => {
     getFiles();
   }, []);
 
-  const handleFileUpload = async (index) => {
-    const response = await API.uploadFile(index);
+  const handleFileUpload = async (file) => {
+    const token = await getAccessTokenSilently();
 
-    if (response) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("user", "dilshanhiruna");
+
+    const response = await getInstance().post(`${baseURL()}/upload`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+
+        // send users id through headers
+        userid: user.email,
+      },
+    });
+
+    if (response.data) {
       getFiles();
     }
 
@@ -44,19 +81,22 @@ const FileManage = () => {
     document.getElementById("file").value = "";
   };
 
-  // const handleClickOpenDialog = () => {
-  //   setOpenDialog(true);
-  // };
-
-  // const handleCloseDialog = () => {
-  //   setOpenDialog(false);
-  // };
-
   const handleFileDelete = async () => {
-    if (selectedFileForDel) {
-      const response = await API.deleteFile(selectedFileForDel);
+    const token = await getAccessTokenSilently();
 
-      if (response) {
+    if (selectedFileForDel) {
+      const response = await getInstance().delete(
+        `${baseURL()}/files/${selectedFileForDel}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // send users id through headers
+            userid: user.email,
+          },
+        }
+      );
+
+      if (response.data) {
         getFiles();
         setselectedFileForDel("");
         setOpenDialog(false);
@@ -85,9 +125,8 @@ const FileManage = () => {
         <div className="file_manager_body">
           <List>
             {Files.map((file, key) => (
-              <>
+              <div key={key}>
                 <ListItem
-                  key={key}
                   secondaryAction={
                     <>
                       <IconButton
@@ -140,7 +179,7 @@ const FileManage = () => {
                   </ListItemIcon>
                   <ListItemText primary={file.name} />
                 </ListItem>
-              </>
+              </div>
             ))}
           </List>
         </div>

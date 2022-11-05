@@ -5,14 +5,9 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useAuth0 } from "@auth0/auth0-react";
 
 const Dashboard = () => {
-  const {
-    loginWithPopup,
-    loginWithRedirect,
-    logout,
-    user,
-    isAuthenticated,
-    isLoading,
-  } = useAuth0();
+  const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
+    useAuth0();
+
   return (
     <div>
       <div
@@ -28,6 +23,7 @@ const Dashboard = () => {
         >
           ⚡Secure Chat System v0.1
         </h2>
+
         {/* login button */}
         <div className="login">
           {isAuthenticated ? (
