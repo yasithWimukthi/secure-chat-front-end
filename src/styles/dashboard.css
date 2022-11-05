@@ -22,3 +22,30 @@
   background-color: #2a2f3a;
   color: rgb(169, 169, 169);
 }
+
+.profile {
+  display: flex;
+  justify-content: center;
+  background-color: #313641;
+  padding: 10px 20px;
+  border-radius: 15px;
+  border: none;
+  color: rgb(200, 200, 200);
+  margin-right: 20px;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.profile-dp {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background-color: #313641;
+  padding: 5px;
+}
+
+.login-msg {
+  text-align: center;
+  margin-top: 250px;
+}
