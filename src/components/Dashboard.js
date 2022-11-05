@@ -1,8 +1,8 @@
-import Chat from "./Chat";
 import FileManage from "./FileManage";
 import "../styles/dashboard.css";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useAuth0 } from "@auth0/auth0-react";
+import Message from "./Message";
 
 const Dashboard = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
@@ -58,12 +58,18 @@ const Dashboard = () => {
       </div>
 
       {isAuthenticated ? (
-        <div className="dashboard-content">
+        <div
+          className="dashboard-content"
+          style={{
+            marginTop: "100px",
+            marginLeft: "60px",
+          }}
+        >
           <div className="file-area">
             <FileManage />
           </div>
-          <div className="chat-area">
-            <Chat />
+          <div className="file-area">
+            <Message />
           </div>
         </div>
       ) : (

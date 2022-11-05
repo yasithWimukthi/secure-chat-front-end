@@ -104,25 +104,24 @@ const FileManage = () => {
     }
   };
 
-  if (Manager)
-    return (
-      <div className="file_manager_div">
-        <div className="file_manager_header">
-          <div>
-            <h2>File Storage</h2>
-          </div>
-          <div>
-            <label className="file_manager_upload_input_btn">
-              <input
-                id="file"
-                type="file"
-                onChange={(e) => handleFileUpload(e.target.files[0])}
-              />
-              Upload
-            </label>
-          </div>
+  return (
+    <div className="file_manager_div">
+      <div className="file_manager_header">
+        <div>
+          <h2>File Storage</h2>
         </div>
-        <div className="file_manager_body">
+        <div>
+          <label className="file_manager_upload_input_btn">
+            <input
+              id="file"
+              type="file"
+              onChange={(e) => handleFileUpload(e.target.files[0])}
+            />
+            Upload
+          </label>
+        </div>
+      </div>
+      {/* <div className="file_manager_body">
           <List>
             {Files.map((file, key) => (
               <div key={key}>
@@ -182,39 +181,38 @@ const FileManage = () => {
               </div>
             ))}
           </List>
-        </div>
-        {/* Dialog for delete file */}
+        </div> */}
+      {/* Dialog for delete file */}
 
-        <Dialog
-          open={openDialog}
-          onClose={() => {
-            setOpenDialog(false);
-            setselectedFileForDel("");
-          }}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"Are you sure you want to delete this file?"}
-          </DialogTitle>
+      <Dialog
+        open={openDialog}
+        onClose={() => {
+          setOpenDialog(false);
+          setselectedFileForDel("");
+        }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this file?"}
+        </DialogTitle>
 
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setOpenDialog(false);
-                setselectedFileForDel("");
-              }}
-            >
-              Cancel
-            </Button>
-            <Button color="error" onClick={handleFileDelete} autoFocus>
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    );
-  else return <></>;
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setOpenDialog(false);
+              setselectedFileForDel("");
+            }}
+          >
+            Cancel
+          </Button>
+          <Button color="error" onClick={handleFileDelete} autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
 };
 
 export default FileManage;
