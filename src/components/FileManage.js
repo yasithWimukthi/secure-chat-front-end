@@ -11,6 +11,8 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import "../styles/files.css";
 import { DeleteOutline, Download } from "@mui/icons-material";
 import { API } from "../api/api";
+import SriPlugin from "webpack-subresource-integrity";
+
 const FileManage = () => {
   const [Manager, setManager] = useState(true);
   const [Files, setFiles] = useState([]);
@@ -42,6 +44,19 @@ const FileManage = () => {
       getFiles();
     }
   };
+
+  //data intergrity
+  const compiler = webpack({
+    output: {
+      crossOriginLoading: "anonymous",
+    },
+    plugins: [
+      new SriPlugin({
+        hashFuncNames: ["sha256", "sha384"],
+        enabled: process.env.NODE_ENV === "production",
+      }),
+    ],
+  });
 
   if (Manager)
     return (
