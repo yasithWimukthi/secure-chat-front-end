@@ -1,10 +1,4 @@
-import {
-  IconButton,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import { Alert, Snackbar } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { DeleteOutline, Download } from "@mui/icons-material";
@@ -32,11 +26,16 @@ const getInstance = () => {
 const FileManage = () => {
   const { getAccessTokenSilently, user } = useAuth0();
 
-  const [Manager, setManager] = useState(true);
   const [Files, setFiles] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedFileForDel, setselectedFileForDel] = useState(false);
+
+  const [Snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const getFiles = async () => {
     const token = await getAccessTokenSilently();
@@ -53,7 +52,7 @@ const FileManage = () => {
   };
 
   useEffect(() => {
-    getFiles();
+    // getFiles();
   }, []);
 
   const handleFileUpload = async (file) => {
@@ -63,19 +62,32 @@ const FileManage = () => {
     formData.append("file", file);
     formData.append("user", "dilshanhiruna");
 
-    const response = await getInstance().post(`${baseURL()}/upload`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
+    const response = await getInstance()
+      .post(`${baseURL()}/upload`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
 
-        // send users id through headers
-        userid: user.email,
-      },
-    });
-
-    if (response.data) {
-      getFiles();
-    }
+          // send users id through headers
+          userid: user.email,
+        },
+      })
+      .then((res) => {
+        // open snackbar
+        setSnack({
+          open: true,
+          message: "File uploaded successfully",
+          severity: "success",
+        });
+      })
+      .catch((err) => {
+        // open snackbar
+        setSnack({
+          open: true,
+          message: "You are unauthorized to upload files",
+          severity: "error",
+        });
+      });
 
     //clear input
     document.getElementById("file").value = "";
@@ -121,68 +133,6 @@ const FileManage = () => {
           </label>
         </div>
       </div>
-      {/* <div className="file_manager_body">
-          <List>
-            {Files.map((file, key) => (
-              <div key={key}>
-                <ListItem
-                  secondaryAction={
-                    <>
-                      <IconButton
-                        edge="end"
-                        aria-label="download"
-                        onClick={() => {
-                          //download base64 file acording to file type
-                          const link = document.createElement("a");
-                          link.href = `data:${file.type};base64,${file.file}`;
-                          link.download = file.name;
-                          link.click();
-                        }}
-                        style={{
-                          marginRight: "20px",
-                        }}
-                      >
-                        <Download
-                          style={{
-                            color: "rgba(79, 147, 206, 0.300)",
-                          }}
-                        />
-                      </IconButton>
-
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => {
-                          setselectedFileForDel(file.name);
-                          setOpenDialog(true);
-                        }}
-                        style={{
-                          marginRight: "20px",
-                        }}
-                      >
-                        <DeleteOutline
-                          style={{
-                            color: "rgba(79, 147, 206, 0.200)",
-                          }}
-                        />
-                      </IconButton>
-                    </>
-                  }
-                >
-                  <ListItemIcon>
-                    <InsertDriveFileIcon
-                      style={{
-                        color: "#282c34",
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText primary={file.name} />
-                </ListItem>
-              </div>
-            ))}
-          </List>
-        </div> */}
-      {/* Dialog for delete file */}
 
       <Dialog
         open={openDialog}
@@ -211,6 +161,18 @@ const FileManage = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={Snack.open}
+        onClose={() => {
+          setSnack({ open: false, message: "", severity: "" });
+        }}
+        autoHideDuration={6000}
+      >
+        <Alert severity={Snack.severity} sx={{ width: "100%" }}>
+          {Snack.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
