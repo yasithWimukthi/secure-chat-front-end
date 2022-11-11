@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
+import { Alert, Snackbar } from "@mui/material";
 
 const baseURL = () => {
   const apiUrl = process.env.REACT_APP_API
@@ -22,6 +23,12 @@ const Message = () => {
   const { getAccessTokenSilently, user } = useAuth0();
 
   const [message, setMessage] = useState("");
+
+  const [Snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   // send message
   const sendMessage = async () => {
@@ -42,38 +49,66 @@ const Message = () => {
         }
       );
 
-      console.log(response);
-
       if (response.status === 200) {
         setMessage("");
+
+        // open snackbar
+        setSnack({
+          open: true,
+          message: "Message sent successfully",
+          severity: "success",
+        });
       }
     }
   };
 
   return (
-    <div className="file_manager_div">
-      <div className="file_manager_header">
-        <div>
-          <h2>Send Message</h2>
-        </div>
+    <div className="message_div">
+      <div className="message_header">
         <div
           style={{
             display: "flex",
-            justifyContent: "end",
+            justifyContent: "start",
           }}
         >
-          <input
+          <h2>Send Message</h2>
+          <Button
+            size="small"
+            onClick={sendMessage}
+            style={{
+              marginLeft: "10px",
+              height: "40px",
+              marginTop: "18px",
+            }}
+          >
+            <SendIcon />
+          </Button>
+        </div>
+
+        <div>
+          <textarea
             className="text_input"
             placeholder="Enter Message"
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            maxLength="1000"
+            style={{
+              fontFamily: "Roboto",
+            }}
           />
-          <Button size="small" onClick={sendMessage}>
-            <SendIcon />
-          </Button>
         </div>
       </div>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={Snack.open}
+        onClose={() => setSnack({ open: false, message: "", severity: "" })}
+        autoHideDuration={6000}
+      >
+        <Alert severity={Snack.severity} sx={{ width: "100%" }}>
+          {Snack.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
