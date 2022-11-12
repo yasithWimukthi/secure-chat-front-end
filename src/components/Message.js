@@ -5,6 +5,7 @@ import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
 import { Alert, Snackbar } from "@mui/material";
+import { generateHmac } from "../hooks/generateHmac";
 
 const baseURL = () => {
   const apiUrl = process.env.REACT_APP_API
@@ -35,7 +36,7 @@ const Message = () => {
     const token = await getAccessTokenSilently();
 
     if (message.length > 0) {
-      const response = await getInstance()
+      await getInstance()
         .post(
           `${baseURL()}/message`,
           {
@@ -46,6 +47,8 @@ const Message = () => {
               Authorization: `Bearer ${token}`,
               // send users id through headers
               userid: user.email,
+              // send hmac through headers
+              signature: generateHmac(message.trim()),
             },
           }
         )
