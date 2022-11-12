@@ -8,13 +8,31 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { MenuItem, Select } from "@mui/material";
+import { Button, MenuItem, Select } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import { Alert, Snackbar } from "@mui/material";
+import DialogTitle from "@mui/material/DialogTitle";
 
 export const Admin = () => {
   const { getAccessTokenSilently, user } = useAuth0();
 
   const [Users, setUsers] = useState([]);
   const [Roles, setRoles] = useState([]);
+  const [openCreateNewUser, setOpenCreateNewUser] = React.useState(false);
+
+  const [Snack, setSnack] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
+
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+  });
 
   const getUsers = async () => {
     const response = await axios.get(
@@ -111,16 +129,139 @@ export const Admin = () => {
       }
     );
 
+    // open snack bar
+    setSnack({
+      open: true,
+      message: "User role updated successfully",
+      severity: "success",
+    });
+
     getUsers();
+  };
+
+  // auth0 password validation
+  const validatePassword = (password) => {
+    const passwordRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+    );
+
+    return passwordRegex.test(password);
+  };
+
+  // create new user
+  const createNewUser = async (email, password) => {
+    // check if the password is valid
+    if (!validatePassword(password)) {
+      setSnack({
+        open: true,
+        message:
+          "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character",
+        severity: "error",
+      });
+      return;
+    }
+    await axios
+      .post(
+        "https://dev-qup5pjoxhm8l63sb.us.auth0.com/api/v2/users",
+        {
+          connection: "Username-Password-Authentication",
+          email: email,
+          password: password,
+          verify_email: false,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_AUTH0_MANAGEMENT_TOKEN}`,
+          },
+        }
+      )
+      .then(async (response) => {
+        getUsers();
+        setOpenCreateNewUser(false);
+
+        // open snackbar
+        setSnack({
+          open: true,
+          message: "User created successfully",
+          severity: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setOpenCreateNewUser(false);
+
+        // open snackbar
+        setSnack({
+          open: true,
+          message: "Error creating user",
+          severity: "error",
+        });
+      });
   };
 
   return (
     <div>
-      <h1>User Management</h1>
-      {/* update auth0 user roles */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "start",
+        }}
+      >
+        <h1>User Management</h1>{" "}
+        <Button
+          style={{ marginLeft: "15px", height: "35px", marginTop: "28px" }}
+          variant="outlined"
+          onClick={() => setOpenCreateNewUser(true)}
+        >
+          Create new user
+        </Button>
+        <Dialog
+          open={openCreateNewUser}
+          onClose={() => setOpenCreateNewUser(false)}
+        >
+          <DialogTitle>Create a new user</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+              onChange={(e) =>
+                setNewUser({ ...newUser, email: e.target.value })
+              }
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Password"
+              type="password"
+              fullWidth
+              variant="standard"
+              onChange={(e) =>
+                setNewUser({ ...newUser, password: e.target.value })
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenCreateNewUser(false)}>Cancel</Button>
+            <Button
+              onClick={() => {
+                createNewUser(newUser.email, newUser.password);
+              }}
+            >
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
 
-      <TableContainer component={Paper} sx={{ maxWidth: "90%" }}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+      {/* update auth0 user roles */}
+      <TableContainer component={Paper} sx={{ maxWidth: "95%" }}>
+        <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
@@ -171,6 +312,18 @@ export const Admin = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={Snack.open}
+        onClose={() => {
+          setSnack({ open: false, message: "", severity: "" });
+        }}
+        autoHideDuration={6000}
+      >
+        <Alert severity={Snack.severity} sx={{ width: "100%" }}>
+          {Snack.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
