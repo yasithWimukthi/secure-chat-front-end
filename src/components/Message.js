@@ -35,30 +35,49 @@ const Message = () => {
     const token = await getAccessTokenSilently();
 
     if (message.length > 0) {
-      const response = await getInstance().post(
-        `${baseURL()}/message`,
-        {
-          message: message.trim(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // send users id through headers
-            userid: user.email,
+      const response = await getInstance()
+        .post(
+          `${baseURL()}/message`,
+          {
+            message: message.trim(),
           },
-        }
-      );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              // send users id through headers
+              userid: user.email,
+            },
+          }
+        )
+        .then((res) => {
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "Message sent successfully",
+            severity: "success",
+          });
 
-      if (response.status === 200) {
-        setMessage("");
+          // clear message
+          setMessage("");
+        })
+        .catch((err) => {
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "You are unauthorized to send message",
+            severity: "error",
+          });
 
-        // open snackbar
-        setSnack({
-          open: true,
-          message: "Message sent successfully",
-          severity: "success",
+          // clear message
+          setMessage("");
         });
-      }
+    } else {
+      // open snackbar
+      setSnack({
+        open: true,
+        message: "Message can not be empty",
+        severity: "error",
+      });
     }
   };
 

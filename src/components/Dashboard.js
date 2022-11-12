@@ -8,6 +8,8 @@ const Dashboard = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
     useAuth0();
 
+  console.log(user);
+
   return (
     <div>
       <div
@@ -16,13 +18,15 @@ const Dashboard = () => {
           justifyContent: "space-between",
         }}
       >
-        <h2
-          style={{
-            marginLeft: "60px",
-          }}
-        >
-          ⚡Secure System v0.1
-        </h2>
+        <div>
+          <h2
+            style={{
+              marginLeft: "60px",
+            }}
+          >
+            ⚡Secure System v0.1
+          </h2>
+        </div>
 
         {/* login button */}
         <div className="login">
@@ -34,6 +38,11 @@ const Dashboard = () => {
               <div className="profile">
                 <div>
                   <span>{user.name}</span>
+                </div>
+              </div>
+              <div className="profile">
+                <div>
+                  <span>{user.role}</span>
                 </div>
               </div>
               <button
