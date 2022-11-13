@@ -62,7 +62,7 @@ const FileManage = () => {
     formData.append("file", file);
     formData.append("user", "dilshanhiruna");
 
-    validateSelectedFile(file);
+    const res = validateSelectedFile(file);
     const response = await getInstance()
       .post(`${baseURL()}/upload`, formData, {
         headers: {
@@ -96,17 +96,17 @@ const FileManage = () => {
   };
 
   const validateSelectedFile = (file) => {
-    const MAX_FILE_SIZE = 5120; // 5MB
+    const MAX_FILE_SIZE = 1024; // 5MB
 
-    if (!file) {
-      // open snackbar
-      setSnack({
-        open: true,
-        message: "Please choose a file",
-        severity: "error",
-      });
-      return;
-    }
+    // if (!file) {
+    //   // open snackbar
+    //   setSnack({
+    //     open: true,
+    //     message: "Please choose a file",
+    //     severity: "error",
+    //   });
+    //   return;
+    // }
     console.log("start size check");
 
     const fileSizeKiloBytes = file.size / 1024;
@@ -118,9 +118,10 @@ const FileManage = () => {
         severity: "error",
       });
       console.log("size not ok");
-      return;
+      return false;
     }
     console.log("size ok");
+    return true;
   };
 
   const handleFileDelete = async () => {
