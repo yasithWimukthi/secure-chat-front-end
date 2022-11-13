@@ -1,6 +1,8 @@
 .file-area {
-  width: 45%;
-  margin: 0 auto;
+  width: 50%;
+  margin-top: 20px;
+  margin-left: 20px;
+  /* margin: auto; */
   background-color: rgba(79, 147, 206, 0.103);
   border-radius: 10px;
   border: 1px solid #04426113;
@@ -42,4 +44,49 @@
 }
 .file_manager_upload_input_btn input {
   display: none;
+}
+
+.text_input {
+  display: flex;
+  background-color: #313641;
+  padding: 10px 20px;
+  border-radius: 15px;
+  border: none;
+  color: rgb(200, 200, 200);
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 12px;
+}
+
+.message-area {
+  width: 50%;
+  margin-top: 20px;
+  margin-left: 20px;
+  /* margin: auto; */
+  background-color: rgba(79, 147, 206, 0.103);
+  border-radius: 10px;
+  border: 1px solid #04426113;
+  /* height: 83vh; */
+}
+
+.message_header {
+  padding: 20px;
+  background-color: rgba(79, 147, 206, 0.103);
+  border-radius: 10px;
+  margin: auto;
+}
+.message_header h2 {
+  font-size: 1.5rem;
+  color: rgb(179, 179, 179);
+}
+.message_header textarea {
+  width: 94%;
+  height: 100px;
+  border-radius: 10px;
+  border: 1px solid #04426113;
+  padding: 10px;
+  font-size: 1.2rem;
+  color: rgb(179, 179, 179);
+  background-color: #313641;
+  resize: none;
 }

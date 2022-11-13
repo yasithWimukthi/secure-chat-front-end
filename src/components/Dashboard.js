@@ -1,12 +1,14 @@
-import Chat from "./Chat";
-import FileManage from "./FileManage";
 import "../styles/dashboard.css";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import { useAuth0 } from "@auth0/auth0-react";
+import { User } from "./User";
+import { Admin } from "./Admin";
 
 const Dashboard = () => {
   const { loginWithRedirect, logout, user, isAuthenticated, isLoading } =
     useAuth0();
+
+  console.log(user);
 
   return (
     <div>
@@ -16,13 +18,15 @@ const Dashboard = () => {
           justifyContent: "space-between",
         }}
       >
-        <h2
-          style={{
-            marginLeft: "60px",
-          }}
-        >
-          ⚡Secure Chat System v0.1
-        </h2>
+        <div>
+          <h2
+            style={{
+              marginLeft: "60px",
+            }}
+          >
+            ⚡Secure System v0.1
+          </h2>
+        </div>
 
         {/* login button */}
         <div className="login">
@@ -34,6 +38,11 @@ const Dashboard = () => {
               <div className="profile">
                 <div>
                   <span>{user.name}</span>
+                </div>
+              </div>
+              <div className="profile">
+                <div>
+                  <span>{user.role}</span>
                 </div>
               </div>
               <button
@@ -58,13 +67,14 @@ const Dashboard = () => {
       </div>
 
       {isAuthenticated ? (
-        <div className="dashboard-content">
-          <div className="file-area">
-            <FileManage />
-          </div>
-          <div className="chat-area">
-            <Chat />
-          </div>
+        <div
+          className="dashboard-content"
+          style={{
+            marginTop: "100px",
+            marginLeft: "60px",
+          }}
+        >
+          {user.role[0] === "admin" ? <Admin /> : <User />}
         </div>
       ) : (
         <div className="login-msg">

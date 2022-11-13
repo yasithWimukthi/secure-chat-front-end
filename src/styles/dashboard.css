@@ -1,6 +1,4 @@
 .dashboard-content {
-  display: flex;
-  justify-content: space-between;
 }
 .login {
   display: flex;
@@ -41,6 +39,7 @@
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
+
   background-color: #313641;
   padding: 5px;
 }
