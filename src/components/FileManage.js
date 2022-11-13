@@ -62,35 +62,62 @@ const FileManage = () => {
     formData.append("file", file);
     formData.append("user", "dilshanhiruna");
 
-    const response = await getInstance()
-      .post(`${baseURL()}/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+    const res = validateSelectedFile(file);
+    console.log(res);
+    if (res == true) {
+      const response = await getInstance()
+        .post(`${baseURL()}/upload`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
 
-          // send users id through headers
-          userid: user.email,
-        },
-      })
-      .then((res) => {
-        // open snackbar
-        setSnack({
-          open: true,
-          message: "File uploaded successfully",
-          severity: "success",
+            // send users id through headers
+            userid: user.email,
+          },
+        })
+        .then((res) => {
+          console.log("uploaded");
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "File uploaded successfully",
+            severity: "success",
+          });
+        })
+        .catch((err) => {
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "You are unauthorized to upload files",
+            severity: "error",
+          });
         });
-      })
-      .catch((err) => {
-        // open snackbar
-        setSnack({
-          open: true,
-          message: "You are unauthorized to upload files",
-          severity: "error",
-        });
-      });
 
+      // //clear input
+      // document.getElementById("file").value = "";
+    }
     //clear input
     document.getElementById("file").value = "";
+  };
+
+  const validateSelectedFile = (file) => {
+    const MAX_FILE_SIZE = 5120; // 5MB
+
+    console.log("start size check");
+
+    const fileSizeKiloBytes = file.size / 1024;
+    if (fileSizeKiloBytes > MAX_FILE_SIZE) {
+      // open snackbar
+      setSnack({
+        open: true,
+        message: "File size is greater than maximum limit",
+        severity: "error",
+      });
+      console.log("size not ok");
+      return false;
+    }
+    console.log("size ok");
+    return true;
   };
 
   const handleFileDelete = async () => {
@@ -127,6 +154,9 @@ const FileManage = () => {
             <input
               id="file"
               type="file"
+              // allowedExtensions=".doc, .docx, .xls, .xlsx"
+              // maxFileSize={28400000}
+              accept=".doc, .docx, .xls, .xlsx, .pdf"
               onChange={(e) => handleFileUpload(e.target.files[0])}
             />
             Upload
