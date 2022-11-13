@@ -99,17 +99,8 @@ const FileManage = () => {
   };
 
   const validateSelectedFile = (file) => {
-    const MAX_FILE_SIZE = 1024; // 5MB
+    const MAX_FILE_SIZE = 5120; // 5MB
 
-    // if (!file) {
-    //   // open snackbar
-    //   setSnack({
-    //     open: true,
-    //     message: "Please choose a file",
-    //     severity: "error",
-    //   });
-    //   return;
-    // }
     console.log("start size check");
 
     const fileSizeKiloBytes = file.size / 1024;
