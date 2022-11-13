@@ -62,6 +62,7 @@ const FileManage = () => {
     formData.append("file", file);
     formData.append("user", "dilshanhiruna");
 
+    validateSelectedFile(file);
     const response = await getInstance()
       .post(`${baseURL()}/upload`, formData, {
         headers: {
@@ -91,6 +92,39 @@ const FileManage = () => {
 
     //clear input
     document.getElementById("file").value = "";
+  };
+
+  const validateSelectedFile = (file) => {
+    const MAX_FILE_SIZE = 5120; // 5MB
+
+    if (!file) {
+      // open snackbar
+      setSnack({
+        open: true,
+        message: "Please choose a file",
+        severity: "error",
+      });
+      return;
+    }
+
+    var allowedExtensions = ".doc, .docx, .xls, .xlsx, .pdf";
+    const fileSizeKiloBytes = file.size / 1024;
+    if (!allowedExtensions.exec(file)) {
+      setSnack({
+        open: true,
+        message: "Invaild file format",
+        severity: "error",
+      });
+      return;
+    } else if (fileSizeKiloBytes > MAX_FILE_SIZE) {
+      // open snackbar
+      setSnack({
+        open: true,
+        message: "File size is greater than maximum limit",
+        severity: "error",
+      });
+      return;
+    }
   };
 
   const handleFileDelete = async () => {
@@ -127,6 +161,8 @@ const FileManage = () => {
             <input
               id="file"
               type="file"
+              // allowedExtensions=".doc, .docx, .xls, .xlsx"
+              // maxFileSize={28400000}
               onChange={(e) => handleFileUpload(e.target.files[0])}
             />
             Upload
