@@ -93,9 +93,11 @@ const FileManage = () => {
           });
         });
 
-      //clear input
-      document.getElementById("file").value = "";
+      // //clear input
+      // document.getElementById("file").value = "";
     }
+    //clear input
+    document.getElementById("file").value = "";
   };
 
   const validateSelectedFile = (file) => {
