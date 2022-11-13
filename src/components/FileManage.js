@@ -74,6 +74,7 @@ const FileManage = () => {
         },
       })
       .then((res) => {
+        console.log("uploaded");
         // open snackbar
         setSnack({
           open: true,
@@ -106,25 +107,20 @@ const FileManage = () => {
       });
       return;
     }
+    console.log("start size check");
 
-    var allowedExtensions = ".doc, .docx, .xls, .xlsx, .pdf";
     const fileSizeKiloBytes = file.size / 1024;
-    if (!allowedExtensions.exec(file)) {
-      setSnack({
-        open: true,
-        message: "Invaild file format",
-        severity: "error",
-      });
-      return;
-    } else if (fileSizeKiloBytes > MAX_FILE_SIZE) {
+    if (fileSizeKiloBytes > MAX_FILE_SIZE) {
       // open snackbar
       setSnack({
         open: true,
         message: "File size is greater than maximum limit",
         severity: "error",
       });
+      console.log("size not ok");
       return;
     }
+    console.log("size ok");
   };
 
   const handleFileDelete = async () => {
@@ -163,6 +159,7 @@ const FileManage = () => {
               type="file"
               // allowedExtensions=".doc, .docx, .xls, .xlsx"
               // maxFileSize={28400000}
+              accept=".doc, .docx, .xls, .xlsx, .pdf"
               onChange={(e) => handleFileUpload(e.target.files[0])}
             />
             Upload
