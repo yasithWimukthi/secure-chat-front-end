@@ -63,36 +63,39 @@ const FileManage = () => {
     formData.append("user", "dilshanhiruna");
 
     const res = validateSelectedFile(file);
-    const response = await getInstance()
-      .post(`${baseURL()}/upload`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+    console.log(res);
+    if (res == true) {
+      const response = await getInstance()
+        .post(`${baseURL()}/upload`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
 
-          // send users id through headers
-          userid: user.email,
-        },
-      })
-      .then((res) => {
-        console.log("uploaded");
-        // open snackbar
-        setSnack({
-          open: true,
-          message: "File uploaded successfully",
-          severity: "success",
+            // send users id through headers
+            userid: user.email,
+          },
+        })
+        .then((res) => {
+          console.log("uploaded");
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "File uploaded successfully",
+            severity: "success",
+          });
+        })
+        .catch((err) => {
+          // open snackbar
+          setSnack({
+            open: true,
+            message: "You are unauthorized to upload files",
+            severity: "error",
+          });
         });
-      })
-      .catch((err) => {
-        // open snackbar
-        setSnack({
-          open: true,
-          message: "You are unauthorized to upload files",
-          severity: "error",
-        });
-      });
 
-    //clear input
-    document.getElementById("file").value = "";
+      //clear input
+      document.getElementById("file").value = "";
+    }
   };
 
   const validateSelectedFile = (file) => {
