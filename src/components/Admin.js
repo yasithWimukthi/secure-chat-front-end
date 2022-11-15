@@ -62,8 +62,7 @@ export const Admin = () => {
       user.role = userRole.data[0]?.name;
 
       // check for admin
-      //   if (userRole.data[0]?.name !== "admin")
-      Users.push(user);
+      if (userRole.data[0]?.name !== "admin") Users.push(user);
     }
 
     setUsers(Users);
