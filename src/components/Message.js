@@ -6,6 +6,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
 import { Alert, Snackbar } from "@mui/material";
 import { generateHmac } from "../hooks/generateHmac";
+const CryptoJS = require("crypto-js");
 
 const baseURL = () => {
   const apiUrl = process.env.REACT_APP_API
@@ -36,17 +37,14 @@ const Message = () => {
     const token = await getAccessTokenSilently();
 
     if (message.length > 0) {
+      const formattedMessage = await formatMessage(message);
+      const encryptedMessage = await encryptMessage(formattedMessage);
+
       await getInstance()
         .post(
           `${baseURL()}/message`,
           {
-            // prevent XSS attack in javascript.
-            message: message.replace(/\&/g, '&amp;')
-                .replace(/\</g, '&lt;')
-                .replace(/\>/g, '&gt;')
-                .replace(/\"/g, '&quot;')
-                .replace(/\'/g, '&#x27')
-                .replace(/\//g, '&#x2F').trim()
+            message: encryptedMessage,
           },
           {
             headers: {
@@ -54,7 +52,7 @@ const Message = () => {
               // send users id through headers
               userid: user.email,
               // send hmac through headers
-              signature: generateHmac(message.trim()),
+              signature: generateHmac(encryptedMessage.trim()),
             },
           }
         )
@@ -88,6 +86,26 @@ const Message = () => {
         severity: "error",
       });
     }
+  };
+
+  // prevent XSS attack in javascript.
+  const formatMessage = async (message) => {
+    return await message
+      .replace(/\&/g, "&amp;")
+      .replace(/\</g, "&lt;")
+      .replace(/\>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/\'/g, "&#x27")
+      .replace(/\//g, "&#x2F")
+      .trim();
+  };
+
+  const encryptMessage = async (message) => {
+    var ciphertext = CryptoJS.AES.encrypt(
+      message,
+      process.env.REACT_APP_AES_SECRET
+    ).toString();
+    return ciphertext;
   };
 
   return (
