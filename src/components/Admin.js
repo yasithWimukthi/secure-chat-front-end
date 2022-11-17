@@ -8,7 +8,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Button, MenuItem, Select } from "@mui/material";
+import { Button, CircularProgress, MenuItem, Select } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -23,6 +23,8 @@ export const Admin = () => {
   const [Roles, setRoles] = useState([]);
   const [openCreateNewUser, setOpenCreateNewUser] = React.useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [Snack, setSnack] = useState({
     open: false,
     message: "",
@@ -35,6 +37,8 @@ export const Admin = () => {
   });
 
   const getUsers = async () => {
+    setIsLoading(true);
+
     const response = await axios.get(
       "https://dev-qup5pjoxhm8l63sb.us.auth0.com/api/v2/users",
       {
@@ -66,6 +70,7 @@ export const Admin = () => {
     }
 
     setUsers(Users);
+    setIsLoading(false);
   };
 
   // get user roles
@@ -138,6 +143,12 @@ export const Admin = () => {
     getUsers();
   };
 
+  // auth0 email validation
+  const validateEmail = (email) => {
+    var re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
   // auth0 password validation
   const validatePassword = (password) => {
     const passwordRegex = new RegExp(
@@ -149,6 +160,26 @@ export const Admin = () => {
 
   // create new user
   const createNewUser = async (email, password) => {
+    // check required fields
+    if (!email || !password) {
+      setSnack({
+        open: true,
+        message: "Please fill all fields",
+        severity: "error",
+      });
+      return;
+    }
+
+    // check if the email is valid
+    if (!validateEmail(email)) {
+      setSnack({
+        open: true,
+        message: "Invalid email",
+        severity: "error",
+      });
+      return;
+    }
+
     // check if the password is valid
     if (!validatePassword(password)) {
       setSnack({
@@ -259,58 +290,71 @@ export const Admin = () => {
       </div>
 
       {/* update auth0 user roles */}
-      <TableContainer component={Paper} sx={{ maxWidth: "95%" }}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell align="right">Nickname</TableCell>
-              <TableCell align="right">Email</TableCell>
-              <TableCell align="right">Login Counts</TableCell>
-              <TableCell align="right">Create At</TableCell>
-              <TableCell align="right">last Login</TableCell>
-              <TableCell align="right">Role</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Users.map((row) => (
-              <TableRow
-                key={row.name}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.nickname}</TableCell>
-                <TableCell align="right">{row.email}</TableCell>
-                <TableCell align="right">{row.logins_count}</TableCell>
-                <TableCell align="right">
-                  {Date(row.created_at).toLocaleString().slice(0, 15)}
-                </TableCell>
-                <TableCell align="right">
-                  {Date(row.last_login).toLocaleString().slice(0, 15)}
-                </TableCell>
-                <TableCell align="right">
-                  {
-                    // select role
-                    <Select
-                      defaultValue={row.role}
-                      value={row.role}
-                      onChange={(e) => updateUserRole(row, e.target.value)}
-                    >
-                      {Roles.map((role) => (
-                        <MenuItem key={role.id} value={role.name}>
-                          {role.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  }
-                </TableCell>
+      {isLoading ? (
+        <CircularProgress
+          size={20}
+          style={{
+            display: isLoading ? "block" : "none",
+            marginRight: "5px",
+            marginTop: "3px",
+            color: "white",
+          }}
+        />
+      ) : (
+        <TableContainer component={Paper} sx={{ maxWidth: "95%" }}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell align="right">Nickname</TableCell>
+                <TableCell align="right">Email</TableCell>
+                <TableCell align="right">Login Counts</TableCell>
+                <TableCell align="right">Create At</TableCell>
+                <TableCell align="right">last Login</TableCell>
+                <TableCell align="right">Role</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {Users.map((row) => (
+                <TableRow
+                  key={row.name}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.name}
+                  </TableCell>
+                  <TableCell align="right">{row.nickname}</TableCell>
+                  <TableCell align="right">{row.email}</TableCell>
+                  <TableCell align="right">{row.logins_count}</TableCell>
+                  <TableCell align="right">
+                    {Date(row.created_at).toLocaleString().slice(0, 15)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {Date(row.last_login).toLocaleString().slice(0, 15)}
+                  </TableCell>
+                  <TableCell align="right">
+                    {
+                      // select role
+                      <Select
+                        disabled={isLoading}
+                        defaultValue={row.role}
+                        value={row.role}
+                        onChange={(e) => updateUserRole(row, e.target.value)}
+                      >
+                        {Roles.map((role) => (
+                          <MenuItem key={role.id} value={role.name}>
+                            {role.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    }
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={Snack.open}

@@ -9,6 +9,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
+const CryptoJS = require("crypto-js");
 
 const baseURL = () => {
   const apiUrl = process.env.REACT_APP_API
@@ -59,50 +60,61 @@ const FileManage = () => {
   const handleFileUpload = async (file) => {
     setIsLoading(true);
     const token = await getAccessTokenSilently();
+    // const encryptedFile = await encryptFile(file);
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("user", "dilshanhiruna");
+    var reader = await new FileReader();
+    reader.onload = async () => {
+      var wordArray = await CryptoJS.lib.WordArray.create(reader.result); // Convert: ArrayBuffer -> WordArray
+      var encrypted = await CryptoJS.AES.encrypt(
+        wordArray,
+        process.env.REACT_APP_AES_SECRET
+      ).toString(); // Encryption: I: WordArray -> O: -> Base64 encoded string (OpenSSL-format)
+      // var encryptedFile = await new Blob([encrypted]); // Create blob from string
 
-    const res = validateSelectedFile(file);
-    console.log(res);
-    if (res == true) {
-      const response = await getInstance()
-        .post(`${baseURL()}/upload`, formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
+      const body = { file: encrypted };
 
-            // send users id through headers
-            userid: user.email,
-          },
-        })
-        .then((res) => {
-          console.log("uploaded");
-          // open snackbar
-          setSnack({
-            open: true,
-            message: "File uploaded successfully",
-            severity: "success",
+      const res = await validateSelectedFile(file);
+
+      console.log(res);
+      if (res == true) {
+        const response = await getInstance()
+          .post(`${baseURL()}/upload`, body, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              // "Content-Type": "multipart/form-data",
+
+              // send users id through headers
+              userid: user.email,
+            },
+          })
+          .then((res) => {
+            console.log("uploaded");
+            // open snackbar
+            setSnack({
+              open: true,
+              message: "File uploaded successfully",
+              severity: "success",
+            });
+          })
+          .catch((err) => {
+            // open snackbar
+            setSnack({
+              open: true,
+              message: "You are unauthorized to upload files",
+              severity: "error",
+            });
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
-        })
-        .catch((err) => {
-          // open snackbar
-          setSnack({
-            open: true,
-            message: "You are unauthorized to upload files",
-            severity: "error",
-          });
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
 
-      // //clear input
-      // document.getElementById("file").value = "";
-    }
-    //clear input
-    document.getElementById("file").value = "";
+        // //clear input
+        // document.getElementById("file").value = "";
+      }
+      //clear input
+      document.getElementById("file").value = "";
+    };
+    reader.readAsArrayBuffer(file);
   };
 
   const validateSelectedFile = (file) => {
@@ -124,6 +136,40 @@ const FileManage = () => {
     console.log("size ok");
     return true;
   };
+
+  const encryptFile = async (file) => {
+    var reader = await new FileReader();
+    reader.onload = async () => {
+      var key = "1234567887654321";
+      var wordArray = await CryptoJS.lib.WordArray.create(reader.result); // Convert: ArrayBuffer -> WordArray
+      var encrypted = await CryptoJS.AES.encrypt(wordArray, key).toString(); // Encryption: I: WordArray -> O: -> Base64 encoded string (OpenSSL-format)
+
+      var fileEnc = await new Blob([encrypted]); // Create blob from string
+
+      // console.log(encrypted);
+      console.log(fileEnc);
+      return await fileEnc;
+    };
+    await reader.readAsArrayBuffer(file);
+  };
+
+  // async function decrypt(file) {
+  //   await console.log(typeof file);
+  //   await console.log(file);
+
+  // var reader = new FileReader();
+  //   reader.onload = () => {
+  //     var key = "1234567887654321";
+
+  //     var decrypted = CryptoJS.AES.decrypt(reader.result, key); // Decryption: I: Base64 encoded string (OpenSSL-format) -> O: WordArray
+  //     var typedArray = convertWordArrayToUint8Array(decrypted); // Convert: WordArray -> typed array
+
+  //     var fileDec = new Blob([typedArray]); // Create blob from typed array
+
+  //     return fileDec;
+  //   };
+  // reader.readAsText(file);
+  // }
 
   const handleFileDelete = async () => {
     const token = await getAccessTokenSilently();
