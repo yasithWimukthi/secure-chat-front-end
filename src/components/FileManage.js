@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import { DeleteOutline, Download } from "@mui/icons-material";
@@ -30,6 +30,7 @@ const FileManage = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedFileForDel, setselectedFileForDel] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [Snack, setSnack] = useState({
     open: false,
@@ -56,6 +57,7 @@ const FileManage = () => {
   }, []);
 
   const handleFileUpload = async (file) => {
+    setIsLoading(true);
     const token = await getAccessTokenSilently();
 
     const formData = new FormData();
@@ -91,6 +93,9 @@ const FileManage = () => {
             message: "You are unauthorized to upload files",
             severity: "error",
           });
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
 
       // //clear input
@@ -147,17 +152,27 @@ const FileManage = () => {
     <div className="file_manager_div">
       <div className="file_manager_header">
         <div>
-          <h2>File Storage</h2>
+          <h2>File Storage </h2>
         </div>
         <div>
           <label className="file_manager_upload_input_btn">
             <input
+              disabled={isLoading}
               id="file"
               type="file"
               // allowedExtensions=".doc, .docx, .xls, .xlsx"
               // maxFileSize={28400000}
               accept=".doc, .docx, .xls, .xlsx, .pdf"
               onChange={(e) => handleFileUpload(e.target.files[0])}
+            />
+            <CircularProgress
+              size={20}
+              style={{
+                display: isLoading ? "block" : "none",
+                marginRight: "5px",
+                marginTop: "3px",
+                color: "white",
+              }}
             />
             Upload
           </label>

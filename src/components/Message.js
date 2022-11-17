@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import axios from "axios";
 import { useAuth0 } from "@auth0/auth0-react";
 import "../styles/files.css";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 import { generateHmac } from "../hooks/generateHmac";
 const CryptoJS = require("crypto-js");
 
@@ -26,6 +26,8 @@ const Message = () => {
 
   const [message, setMessage] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [Snack, setSnack] = useState({
     open: false,
     message: "",
@@ -34,6 +36,7 @@ const Message = () => {
 
   // send message
   const sendMessage = async () => {
+    setIsLoading(true);
     const token = await getAccessTokenSilently();
 
     if (message.length > 0) {
@@ -77,6 +80,9 @@ const Message = () => {
 
           // clear message
           setMessage("");
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
       // open snackbar
@@ -119,6 +125,7 @@ const Message = () => {
         >
           <h2>Send Message</h2>
           <Button
+            disabled={isLoading}
             size="small"
             onClick={sendMessage}
             style={{
@@ -127,7 +134,7 @@ const Message = () => {
               marginTop: "18px",
             }}
           >
-            <SendIcon />
+            {isLoading ? <CircularProgress size={20} /> : <SendIcon />}
           </Button>
         </div>
 
